@@ -193,6 +193,8 @@
     <ProjectReference Include="..\SharpOSC.iOS\SharpOSC.iOS.csproj">
       <Project>{C90B29EB-45C8-45EC-A9CA-481048565D84}</Project>
       <Name>SharpOSC.iOS</Name>
+      <IsAppExtension>false</IsAppExtension>
+      <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

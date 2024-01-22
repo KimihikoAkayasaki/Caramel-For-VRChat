@@ -1,0 +1,65 @@
+name: Check-Build
+
+on: [push]
+
+jobs:
+  plugin:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: ['7.0.x' ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+          
+      - name: Restore and build (publish)
+        run: dotnet publish Caramel\Caramel.csproj --configuration Release /p:PublishProfile=Caramel\Properties\PublishProfiles\FolderProfile.pubxml
+
+      - name: Pack published files
+        run: |
+          cd Caramel/bin/Release/net7.0/win10-x64/publish
+          7z a plugin_Caramel.zip *
+        
+      - name: Upload plugin artifact
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "plugin_Caramel Build Artifact"
+          files: |
+            ./Caramel/bin/Release/net7.0/win10-x64/publish/plugin_Caramel.zip
+            ./external/manifest.json
+            
+  app:
+    needs: plugin
+    runs-on: macos-12
+    strategy:
+      matrix:
+        dotnet-version: ['7.0.x' ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+          
+      - name: Restore and build (publish)
+        run: msbuild /p:Configuration=Release /p:ArchiveOnBuild=true /t:"Build"
+
+      - name: Pack published files
+        run: |
+          cd Caramel.Client/bin/iPhoneSimulator/Release && mkdir Payload
+          ls
+
+          mv Runner.app Payload/Caramel.app && zip -r Caramel.ipa Payload
+        
+      - name: Upload app artifact
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./Caramel.Client/bin/iPhoneSimulator/Release/Caramel.ipa
+          overwrite: true

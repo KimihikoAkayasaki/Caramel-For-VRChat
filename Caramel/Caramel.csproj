@@ -11,6 +11,7 @@
     <Platforms>x64</Platforms>
     <UseWinUI>true</UseWinUI>
     <LangVersion>preview</LangVersion>
+    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
   </PropertyGroup>
 
   <ItemGroup>

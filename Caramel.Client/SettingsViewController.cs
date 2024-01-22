@@ -22,6 +22,7 @@ public partial class SettingsViewController : UITableViewController
 
         AddressField.EditingDidEnd += UpdateSenderAddress;
         PortField.EditingDidEnd += UpdateSenderAddress;
+        DiscoveryButton.TouchUpInside += DiscoveryButton_TouchUpInside;
 
         Xamarin.IQKeyboardManager.SharedManager.Enable = true;
         Xamarin.IQKeyboardManager.SharedManager.ShouldToolbarUsesTextFieldTintColor = true;
@@ -31,6 +32,11 @@ public partial class SettingsViewController : UITableViewController
             await Task.Delay(1500);
             await RunAmethystDiscovery();
         });
+    }
+
+    private void DiscoveryButton_TouchUpInside(object sender, EventArgs e)
+    {
+        Task.Run(RunAmethystDiscovery);
     }
 
     private async Task RunAmethystDiscovery()
@@ -74,6 +80,7 @@ public partial class SettingsViewController : UITableViewController
                 ArKitSkeletonDelegate.GrpChannel = new Channel(address, serverPort, ChannelCredentials.Insecure);
                 ArKitSkeletonDelegate.Client = new Caramethyst.CaramethystClient(ArKitSkeletonDelegate.GrpChannel);
             }
+
             await ArKitSkeletonDelegate.Client.PingAsync(new PingRequest { Name = client });
         }
         catch (Exception)
